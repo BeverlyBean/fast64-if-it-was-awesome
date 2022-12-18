@@ -310,6 +310,8 @@ def ootConvertMeshToC(
         data.source += '#include "' + folderName + '.h"\n\n'
     else:
         data.source += "\n"
+	if bpy.context.scene.celShadingPatch:
+		data.source += '#define G_CELSHADING 0x00400000\n\n'
 
     path = ootGetPath(exportPath, isCustomExport, "assets/objects/", folderName, False, True)
     includeDir = settings.customAssetIncludeDir if settings.isCustom else f"assets/objects/{folderName}"
