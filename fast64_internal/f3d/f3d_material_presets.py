@@ -3948,10 +3948,7 @@ material_presets = {
         "oot_vertex_colored_texture_cutout": oot_vertex_colored_texture_cutout,
         "oot_vertex_colored_texture_transparent": oot_vertex_colored_texture_transparent,
     },
-    "oot_cel": {
-        "oot_cel_shaded_texture" : oot_cel_shaded_texture,
-        "oot_cel_shaded_solid" : oot_cel_shaded_solid
-    },
+    "oot_cel": {"oot_cel_shaded_texture": oot_cel_shaded_texture, "oot_cel_shaded_solid": oot_cel_shaded_solid},
     "sm64": {
         "sm64_decal": sm64_decal,
         "sm64_environment_map": sm64_environment_map,

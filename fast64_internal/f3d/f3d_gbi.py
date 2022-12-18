@@ -331,7 +331,7 @@ class F3D:
         self.G_TEXTURE_GEN_H = self.G_TEXTURE_GEN / 0x10000
         self.G_TEXTURE_GEN_LINEAR_H = self.G_TEXTURE_GEN_LINEAR / 0x10000
         self.G_LOD_H = self.G_LOD / 0x10000  # NOT IMPLEMENTED
-        self.G_CELSHADING_H = (self.G_CELSHADING/0x10000)
+        self.G_CELSHADING_H = self.G_CELSHADING / 0x10000
         if F3DEX_GBI or F3DLP_GBI:
             self.G_CLIPPING_H = self.G_CLIPPING / 0x10000
         # endif
@@ -2758,8 +2758,8 @@ class FTriGroup:
         self.vertexList = VtxList(name + "_vtx_" + str(index))
         self.triList = GfxList(name + "_tri_" + str(index), GfxListTag.Geometry, DLFormat.Static)
         self.celTriLists = []
-        self.celTriListBaseName = name + '_tri_' + str(index) + '_cel'
-        
+        self.celTriListBaseName = name + "_tri_" + str(index) + "_cel"
+
     def add_cel_tri_list(self):
         ret = GfxList(self.celTriListBaseName + str(len(self.celTriLists)), GfxListTag.Geometry, DLFormat.Static)
         self.celTriLists.append(ret)

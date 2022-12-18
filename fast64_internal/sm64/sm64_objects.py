@@ -1,6 +1,16 @@
-import math, bpy, mathutils
+import math, os, bpy, bmesh, mathutils
 from bpy.utils import register_class, unregister_class
+from io import BytesIO
+
+from .sm64_constants import *
 from .sm64_function_map import func_map
+from .sm64_spline import *
+from .sm64_geolayout_classes import *
+from .sm64_utility import check_obj_is_room
+
+from ..utility import *
+from ..f3d.f3d_material import sm64EnumDrawLayers
+from ..util.collection_list_base import get_collection_classes
 
 from ..utility import (
     PluginError,

@@ -467,7 +467,7 @@ def saveMeshWithLargeTexturesByFaces(
             triGroup,
             copy.deepcopy(existingVertData),
             copy.deepcopy(matRegionDict),
-            None
+            None,
         )
 
         currentGroupIndex = saveTriangleStrip(triConverter, tileFaces, obj.data, False)
@@ -817,7 +817,7 @@ def saveMeshByFaces(
         triGroup,
         copy.deepcopy(existingVertData),
         copy.deepcopy(matRegionDict),
-        celShadingInfo
+        celShadingInfo,
     )
 
     currentGroupIndex = saveTriangleStrip(triConverter, faces, obj.data, True)
@@ -960,7 +960,7 @@ class TriangleConverter:
         triGroup: FTriGroup,
         existingVertexData: list[BufferVertex],
         existingVertexMaterialRegions,
-        celShadingInfo
+        celShadingInfo,
     ):
         self.triConverterInfo = triConverterInfo
         self.currentGroupIndex = currentGroupIndex
@@ -986,7 +986,7 @@ class TriangleConverter:
         self.isPointSampled = isPointSampled
         self.exportVertexColors = exportVertexColors
         self.tex_scale = material.f3d_mat.tex_scale
-        
+
         self.celShadingInfo = celShadingInfo
 
     def vertInBuffer(self, bufferVert, material_index):
@@ -1092,8 +1092,8 @@ class TriangleConverter:
                 celTriList.commands.extend(triCmds)
                 celTriList.commands.append(SPEndDisplayList())
                 self.writeCelLevels(celTriList=celTriList)
-            
-    def writeCelLevels(self, celTriList = None, triCmds = None):
+
+    def writeCelLevels(self, celTriList=None, triCmds=None):
         usedRegular = usedInverse = useDecal = False
         for level in self.celShadingInfo["levels"]:
             if level["threshMode"] == "Inverse":
@@ -1117,12 +1117,10 @@ class TriangleConverter:
             if useDecal:
                 if not wroteOpaque:
                     wroteOpaque = True
-                    self.triList.commands.append(SPSetOtherMode("G_SETOTHERMODE_L",
-                        10, 2, ["ZMODE_OPA"]))
+                    self.triList.commands.append(SPSetOtherMode("G_SETOTHERMODE_L", 10, 2, ["ZMODE_OPA"]))
                 elif not wroteDecal and (inv and usedInverse or not inv and usedRegular):
                     wroteDecal = True
-                    self.triList.commands.append(SPSetOtherMode("G_SETOTHERMODE_L",
-                        10, 2, ["ZMODE_DEC"]))
+                    self.triList.commands.append(SPSetOtherMode("G_SETOTHERMODE_L", 10, 2, ["ZMODE_DEC"]))
             if inv:
                 usedInverse = True
             else:
@@ -1130,35 +1128,45 @@ class TriangleConverter:
             if lastInverse != inv:
                 # Set up combiner
                 lastInverse = inv
+
                 def Combiner(a0, b0, c0, d0, aa0, ab0, ac0, ad0):
-                    return DPSetCombineMode(a0, b0, c0, d0, aa0, ab0, ac0, ad0,
-                        a0, b0, c0, d0, aa0, ab0, ac0, ad0)
+                    return DPSetCombineMode(a0, b0, c0, d0, aa0, ab0, ac0, ad0, a0, b0, c0, d0, aa0, ab0, ac0, ad0)
+
                 def CombinerRegular(a0, b0, c0, d0):
                     return Combiner(a0, b0, c0, d0, "SHADE", "0", baseColor, "0")
+
                 def CombinerInverse(a0, b0, c0, d0):
                     return Combiner(a0, b0, c0, d0, "1", "SHADE", baseColor, "0")
+
                 self.triList.commands.append(
-                    (CombinerInverse if inv else CombinerRegular)(
-                        "PRIMITIVE", baseColor, "PRIMITIVE_ALPHA", baseColor
-                    )
+                    (CombinerInverse if inv else CombinerRegular)("PRIMITIVE", baseColor, "PRIMITIVE_ALPHA", baseColor)
                 )
             if level["tintType"] == "Fixed":
-                self.triList.commands.append(DPSetPrimColor(
-                    0,
-                    0,
-                    level["tintFixedColor"][0],
-                    level["tintFixedColor"][1],
-                    level["tintFixedColor"][2],
-                    level["tintFixedLevel"]
-                ))
+                self.triList.commands.append(
+                    DPSetPrimColor(
+                        0,
+                        0,
+                        level["tintFixedColor"][0],
+                        level["tintFixedColor"][1],
+                        level["tintFixedColor"][2],
+                        level["tintFixedLevel"],
+                    )
+                )
             else:
-                self.triList.commands.append(SPDisplayList(GfxList(
-                    "0x0" + format(level["tintSegmentNum"], "X") + format(level["tintSegmentOffset"] * 8, "06X"),
-                    GfxListTag.Material,
-                    DLFormat.Static
-                )))
-            self.triList.commands.append(DPSetBlendColor(255, 255, 255, 
-                255 - level["threshold"] if inv else level["threshold"]))
+                self.triList.commands.append(
+                    SPDisplayList(
+                        GfxList(
+                            "0x0"
+                            + format(level["tintSegmentNum"], "X")
+                            + format(level["tintSegmentOffset"] * 8, "06X"),
+                            GfxListTag.Material,
+                            DLFormat.Static,
+                        )
+                    )
+                )
+            self.triList.commands.append(
+                DPSetBlendColor(255, 255, 255, 255 - level["threshold"] if inv else level["threshold"])
+            )
             if triCmds is not None:
                 self.triList.commands.extend(triCmds)
             else:
@@ -1883,6 +1891,7 @@ def saveOrGetF3DMaterial(material, fModel, obj, drawLayer, convertTextureData):
 
     return fMaterial, texDimensions
 
+
 def getCelShadingInfo(material):
     f3dMat = material.f3d_mat
     if not f3dMat.do_cel_shading:
@@ -1902,6 +1911,7 @@ def getCelShadingInfo(material):
         }
         levels.append(lvl)
     return {"baseColor": str(f3dMat.cel_shading.baseColor), "levels": levels}
+
 
 def getTextureName(texProp: TextureProperty, fModelName: str, overrideName: str) -> str:
     tex = texProp.tex

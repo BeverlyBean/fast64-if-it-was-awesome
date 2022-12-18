@@ -1,4 +1,4 @@
-import os
+import os, bpy
 
 
 def starSelectWarning(operator, fileStatus):

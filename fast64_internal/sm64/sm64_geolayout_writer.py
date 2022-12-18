@@ -123,7 +123,7 @@ from .sm64_constants import (
     level_pointers,
     defaultExtendSegment4,
     level_enums,
-    enumLevelNames
+    enumLevelNames,
 )
 
 
